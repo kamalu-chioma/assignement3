@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fetch Multiple Random Files</title>
+</head>
+<body>
+    <h1>Fetch Multiple Random Files</h1>
+    <form id="fetch-multiple-form">
+        <input type="number" name="count" min="1" max="5" value="5" />
+        <button type="button" onclick="fetchMultipleRandomFiles()">Fetch Files</button>
+    </form>
+    <div id="file-contents"></div>
+    <script>
+        function getFileType(fileName) {
+            const extension = fileName.split('.').pop().toLowerCase();
+            const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
+            return imageExtensions.includes(extension) ? 'image' : 'text';
+        }
+
+        function fetchMultipleRandomFiles() {
+            const count = document.querySelector('input[name="count"]').value;
+            fetch(`/fetch/multiple?count=${count}`)
+                .then(response => response.json())
+                .then(files => {
+                    const fileContentsDiv = document.getElementById('file-contents');
+                    fileContentsDiv.innerHTML = ''; // Clear previous contents
+                    for (const [fileName, content] of Object.entries(files)) {
+                        const fileType = getFileType(fileName);
+
+                        const fileHeader = document.createElement('h3');
+                        fileHeader.innerText = fileName;
+                        fileContentsDiv.appendChild(fileHeader);
+
+                        if (fileType === 'image') {
+                            const img = document.createElement('img');
+                            img.src = `data:image;base64,${content}`;
+                            fileContentsDiv.appendChild(img);
+                        } else {
+                            const pre = document.createElement('pre');
+                            pre.innerText = atob(content);
+                            fileContentsDiv.appendChild(pre);
+                        }
+                    }
+                })
+                .catch(error => console.error('Error fetching files:', error));
+        }
+    </script>
+</body>
+</html>

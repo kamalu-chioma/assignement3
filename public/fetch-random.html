@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fetch Random File</title>
+</head>
+<body>
+    <h1>Fetch Random File</h1>
+    <button onclick="fetchRandomFile()">Fetch Random File</button>
+    <script>
+        function fetchRandomFile() {
+            fetch('/fetch')
+                .then(response => response.blob())
+                .then(blob => {
+                    const url = URL.createObjectURL(blob);
+                    window.open(url);
+                });
+        }
+    </script>
+</body>
+</html>
