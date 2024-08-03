@@ -5,6 +5,7 @@ const app = express();
 const path = require("path");
 const upload_router = require("./router/upload_router");
 const fetch_router = require("./router/fetch_router")
+const mongoose = require("mongoose");
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));
@@ -43,4 +44,14 @@ app.use((req, res) => {
 // Start the server
 app.listen(PORT, () => {
   console.log(`http://localhost:${PORT}`);
+});
+
+// Connect to MongoDB
+mongoose.connect(process.env.MONGODB_URI);
+let db = mongoose.connection;
+db.once("open", () => {
+  console.log("Connected to MongoDB");
+});
+db.on("error", (err) => {
+  console.error("DB Error:" + err);
 });

@@ -1,49 +1,49 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Fetch Multiple Random Files</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fetch Random Files</title>
 </head>
 <body>
-    <h1>Fetch Multiple Random Files</h1>
-    <form id="fetch-multiple-form">
-        <input type="number" name="count" min="1" max="5" value="5" />
-        <button type="button" onclick="fetchMultipleRandomFiles()">Fetch Files</button>
-    </form>
-    <div id="file-contents"></div>
-    <script>
-        function getFileType(fileName) {
-            const extension = fileName.split('.').pop().toLowerCase();
-            const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
-            return imageExtensions.includes(extension) ? 'image' : 'text';
-        }
+  <h1>Fetch Random Files</h1>
+  <label for="imageCount">Number of images to fetch:</label>
+  <input type="number" id="imageCount" min="1" value="2" />
+  <button onclick="fetchRandomFiles()">Fetch Random Files</button>
+  <div id="imageContainer"></div>
+  <script>
+	function fetchRandomFiles() {
+	  const count = document.getElementById('imageCount').value;
+	  if (count < 1) {
+		alert("Please enter a number greater than 0.");
+		return;
+	  }
+	  fetch(`/fetch/multiple?count=${count}`)
+		.then((response) => response.json())
+		.then((data) => {
+		  console.log(data);
+		  const imageContainer = document.getElementById('imageContainer');
+		  imageContainer.innerHTML = ''; // Clear any existing content
+		  if (Array.isArray(data) && data.length > 0) {
+			data.forEach((image) => {
+			  if (image.imageBuffer) {
+				// Create an img element
+				const imgElement = document.createElement('img');
+				imgElement.src = `data:${image.contentType};base64,${image.imageBuffer}`;
+				imgElement.alt = image.filename;
+				imgElement.style.maxWidth = '200px';
+				imgElement.style.margin = '10px';
 
-        function fetchMultipleRandomFiles() {
-            const count = document.querySelector('input[name="count"]').value;
-            fetch(`/fetch/multiple?count=${count}`)
-                .then(response => response.json())
-                .then(files => {
-                    const fileContentsDiv = document.getElementById('file-contents');
-                    fileContentsDiv.innerHTML = ''; // Clear previous contents
-                    for (const [fileName, content] of Object.entries(files)) {
-                        const fileType = getFileType(fileName);
-
-                        const fileHeader = document.createElement('h3');
-                        fileHeader.innerText = fileName;
-                        fileContentsDiv.appendChild(fileHeader);
-
-                        if (fileType === 'image') {
-                            const img = document.createElement('img');
-                            img.src = `data:image;base64,${content}`;
-                            fileContentsDiv.appendChild(img);
-                        } else {
-                            const pre = document.createElement('pre');
-                            pre.innerText = atob(content);
-                            fileContentsDiv.appendChild(pre);
-                        }
-                    }
-                })
-                .catch(error => console.error('Error fetching files:', error));
-        }
-    </script>
+				// Append the img element to the container
+				imageContainer.appendChild(imgElement);
+			  }
+			});
+		  } else {
+			imageContainer.innerHTML = '<p>No images found.</p>';
+		  }
+		})
+		.catch((error) => console.error("Error fetching files:", error));
+	}
+  </script>
 </body>
 </html>
