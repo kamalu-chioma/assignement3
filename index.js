@@ -27,6 +27,14 @@ app.get("/gallery-pagination", (req, res) => {
   res.sendFile(path.join(__dirname, "views", "gallery-pagination.html"));
 });
 
+
+app.get("/fetch-random", (req, res) => {
+  res.sendFile(path.join(__dirname, "/views/fetch-random.html"));
+  });
+app.get("/fetch-multiple-random", (req, res) => {
+  res.sendFile(path.join(__dirname, "/views/fetch-multiple-random.html"));
+});
+
 // Handle 404
 app.use((req, res) => {
   res.status(404).send("Route does not exist on our server");
